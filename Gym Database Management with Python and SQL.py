@@ -1,12 +1,44 @@
 # 1. Gym Database Management with Python and SQL
 
+import mysql.connector
+from mysql.connector import Error
+
+def connect_db():
+    # Connect to DB and return the connection
+    try:
+        conn = mysql.connector.connect("applying_sql_in_python", "root", "PASSWORD", "HOST")
+        if conn.is_connected():
+            return conn
+    except Error as e:
+        print(f"Error: {e}")
+        return None
+
 # Task 1: Add a Member
+def add_member(name, age, trainer_id): # no "id" included because the database will handle auto incrementing a unique id for Members
+    conn = connect_db()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            member_info = (name, age, trainer_id)
+            query = "INSERT INTO Members (name, age, trainer_id) VALUES (%s, %s, %s)"
+            cursor.execute(query, member_info)
+            conn.commit()
+            print(f"New member {name} added!")
+        finally:
+            cursor.close()
+            conn.close()
 
 # Task 2: Add a Workout Session
+def add_workout_session():
+    pass
 
 # Task 3: Updating Member Information
+def update_member_age():
+    pass
 
 # Task 4: Delete a Workout Session
+def delete_workout_session(session_id):
+    pass
 
 # Main
 def main():
@@ -25,7 +57,10 @@ def main():
             continue
 
         if choice == 1:
-            add_member()
+            name = input("What is the new member name: ")
+            age = input(f"What is {name}'s age: ")
+            trainer_id = input(f"What is the id of {name}'s trainer: ") # No trainer table explicit in problem, so just accepting any int here
+            add_member(name, age, trainer_id)
         elif choice == 2:
             add_workout_session()
         elif choice == 3:
