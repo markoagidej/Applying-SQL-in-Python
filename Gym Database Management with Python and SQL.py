@@ -61,6 +61,7 @@ def update_member_age(member_id, age):
             cursor.close()
             conn.close()
             return
+        # Try to update the age of requested member
         try:
             update_info = (member_id, age)
             query = "UPDATE Members VALUES (%s, %s, %s, %s)"
@@ -73,7 +74,31 @@ def update_member_age(member_id, age):
 
 # Task 4: Delete a Workout Session
 def delete_workout_session(session_id):
-    pass
+    conn = connect_db()
+    if conn is not None:
+        cursor = conn.cursor()
+        # First try to see if there is a session with the requested session_id
+        try:
+            session_value = (session_id)
+            search_query = "SELECT * FROM WorkoutSessions WHERE session_id = (%s)"
+            cursor.execute(search_query, session_value)
+            if cursor.fetchone():
+                print(f"There was workout session found with id of \'{session_id}\'!")
+                return
+        except:
+            print("Problem searching for session")
+            cursor.close()
+            conn.close()
+            return
+        # Try to delete teh session by session_id
+        try:
+            query = "DELETE FROM WorkoutSessions WHERE session_id = (%s)"
+            cursor.execute(query, session_value)
+            conn.commit()
+            print(f"Workout Session \'{session_id}\' delted!")
+        finally:
+            cursor.close()
+            conn.close()
 
 # Main
 def main():
@@ -107,6 +132,7 @@ def main():
             age = input("Enter the corrected age for this member: ")
             update_member_age(member_id, age)
         elif choice == 4: # Delete Workout Session
+            session_id = input("What is the id of the session you wish to delete: ")
             delete_workout_session(session_id)
         elif choice == 5:
             print("Thank you, goodbye!")
