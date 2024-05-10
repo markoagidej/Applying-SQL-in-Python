@@ -29,8 +29,19 @@ def add_member(name, age, trainer_id): # no "id" included because the database w
             conn.close()
 
 # Task 2: Add a Workout Session
-def add_workout_session():
-    pass
+def add_workout_session(member_id, date, duration, calories_burned):
+    conn = connect_db()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            workout_info = (member_id, date, duration, calories_burned)
+            query = "INSERT INTO WorkoutSessions (member_id, date, duration_minutes, calories_burned) VALUES (%s, %s, %s, %s)"
+            cursor.execute(query, workout_info)
+            conn.commit()
+            print(f"New workout added for member: {member_id} added!")
+        finally:
+            cursor.close()
+            conn.close()
 
 # Task 3: Updating Member Information
 def update_member_age():
@@ -56,16 +67,20 @@ def main():
             print("Only enter a number 1-5")
             continue
 
-        if choice == 1:
+        if choice == 1: # Add Member
             name = input("What is the new member name: ")
             age = input(f"What is {name}'s age: ")
             trainer_id = input(f"What is the id of {name}'s trainer: ") # No trainer table explicit in problem, so just accepting any int here
             add_member(name, age, trainer_id)
-        elif choice == 2:
-            add_workout_session()
-        elif choice == 3:
+        elif choice == 2: # Add Workout
+            member_id = input("Enter the Member id of the workout: ")
+            date = input("Enter the date of the workout: ")
+            duration = input("Enter the duration in minutes of the workout: ")
+            calories_burned = input("Enter the amount of calories burned for the workout: ")
+            add_workout_session(member_id, date, duration, calories_burned)
+        elif choice == 3: # Update Member Age
             update_member_age()
-        elif choice == 4:
+        elif choice == 4: # Delete Workout Session
             delete_workout_session(session_id)
         elif choice == 5:
             print("Thank you, goodbye!")
