@@ -6,7 +6,7 @@ from mysql.connector import Error
 def connect_db():
     # Connect to DB and return the connection
     try:
-        conn = mysql.connector.connect("applying_sql_in_python", "root", "PASSWORD", "HOST")
+        conn = mysql.connector.connect("applying_sql_in_python", "root", "*963.MADEupPASSWORD", "localhost")
         if conn.is_connected():
             return conn
     except Error as e:
@@ -44,8 +44,32 @@ def add_workout_session(member_id, date, duration, calories_burned):
             conn.close()
 
 # Task 3: Updating Member Information
-def update_member_age():
-    pass
+def update_member_age(member_id, age):
+    conn = connect_db()
+    if conn is not None:
+        cursor = conn.cursor()
+        # First try to see if there is a member with the requested member_id
+        try:
+            age_value = (age)
+            search_query = "SELECT * FROM Members WHERE age = (%s)"
+            cursor.execute(search_query, age_value)
+            if cursor.fetchone():
+                print(f"There was no member found with id of \'{member_id}\'!")
+                return
+        except:
+            print("Problem searching for member")
+            cursor.close()
+            conn.close()
+            return
+        try:
+            update_info = (member_id, age)
+            query = "UPDATE Members VALUES (%s, %s, %s, %s)"
+            cursor.execute(query, update_info)
+            conn.commit()
+            print(f"New workout added for member: {member_id} added!")
+        finally:
+            cursor.close()
+            conn.close()
 
 # Task 4: Delete a Workout Session
 def delete_workout_session(session_id):
@@ -79,7 +103,9 @@ def main():
             calories_burned = input("Enter the amount of calories burned for the workout: ")
             add_workout_session(member_id, date, duration, calories_burned)
         elif choice == 3: # Update Member Age
-            update_member_age()
+            member_id = input("Enter the Member id to update the age of: ")
+            age = input("Enter the corrected age for this member: ")
+            update_member_age(member_id, age)
         elif choice == 4: # Delete Workout Session
             delete_workout_session(session_id)
         elif choice == 5:
