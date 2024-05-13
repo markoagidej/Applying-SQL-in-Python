@@ -62,12 +62,36 @@ def count_members_per_trainer():
             close_connection(conn, cursor)
 
 # Task 3: SQL BETWEEN Usage
+def get_members_in_age_range(start_age, end_age):
+    conn = connect_db()
+    if conn is not None:
+        cursor = conn.cursor()
+        # Try to find age of memebers between the start and end age
+        try:
+            age_values = (start_age, end_age)
+            query = ("SELECT name, age FROM members WHERE age BETWEEN %s and %s")
+            cursor.execute(query, age_values)
+            results = cursor.fetchall()
+            if results:
+                print(f"List of members between ages {start_age} and {end_age}:")
+                for result in results:
+                    print(f"{result[0]}: {result[1]}")
+            else:
+                print(f"No members between ages {start_age} and {end_age}!")
+        except Error as e:
+            print("Error fetching members between specified ages.")
+            print(f"Error: {e}")
+        finally:
+            close_connection(conn, cursor)
 
 
 # main
 def main():
     list_distinct_trainers()
     count_members_per_trainer()
+    start = input("Enter a start age: ")
+    end = input("Enter an end age: ")
+    get_members_in_age_range(start, end)
 
 if __name__ == "__main__":
     main()
